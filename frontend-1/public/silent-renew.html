@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+  <head><title>Silent Renew</title></head>
+  <body>
+    <!--
+      This page is loaded inside a hidden iframe by oidc-client-ts during silent SSO checks.
+      It MUST be served as a static file at the root of the frontend (not behind React Router).
+      It communicates back to the parent window via postMessage.
+    -->
+    <script>
+      // Use the same oidc-client-ts library loaded from the parent window
+      // by importing it from the CDN or the bundled assets.
+      // The simplest approach: load from unpkg and call signinSilentCallback.
+      import('https://cdn.jsdelivr.net/npm/oidc-client-ts@3/dist/browser/oidc-client-ts.min.js')
+        .then(({ UserManager }) => {
+          new UserManager({}).signinSilentCallback();
+        })
+        .catch(() => {
+          // Fallback: try the window.parent approach
+          window.parent.postMessage({ source: 'silent-renew-error' }, '*');
+        });
+    </script>
+  </body>
+</html>

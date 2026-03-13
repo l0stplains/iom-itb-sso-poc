@@ -1,0 +1,38 @@
+/* IOM ITB custom login theme */
+
+/* ── Header: replace text with logo ── */
+#kc-header-wrapper {
+  font-size: 0 !important;        /* Hide the displayName text */
+  line-height: 0 !important;
+  padding-bottom: 24px;
+}
+
+#kc-header-wrapper::before {
+  content: '';
+  display: block;
+  width: 240px;                    /* Logo is 1549x970 (~1.6:1 ratio) */
+  height: 150px;
+  margin: 0 auto 8px;
+  background: url('../img/iom-itb.png') center / contain no-repeat;
+}
+
+/* ── Card: constrain width and prevent overflow ── */
+.card-pf {
+  max-width: 440px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+/* ── Login button: IOM branding ── */
+#kc-form-buttons .pf-c-button.pf-m-primary,
+#kc-form-buttons input.pf-c-button.pf-m-primary {
+  background-color: #1a3a6b;
+  border-color: #1a3a6b;
+}
+
+#kc-form-buttons .pf-c-button.pf-m-primary:hover,
+#kc-form-buttons input.pf-c-button.pf-m-primary:hover {
+  background-color: #142d54;
+  border-color: #142d54;
+}

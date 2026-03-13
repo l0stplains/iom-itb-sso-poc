@@ -1,0 +1,132 @@
+version: "3.9"
+
+networks:
+  sso-net:
+    driver: bridge
+
+volumes:
+  postgres-data:
+
+services:
+
+  # ─────────────────────────────────────────────
+  # PostgreSQL — shared DB for Keycloak + app
+  # ─────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: sso-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      # Do NOT set POSTGRES_DB here — init.sql creates both databases
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5435:5432"
+    networks:
+      - sso-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  # ─────────────────────────────────────────────
+  # Keycloak — SSO identity provider
+  # ─────────────────────────────────────────────
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: sso-keycloak
+    command: start-dev --import-realm
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: postgres
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+      KC_LOG_LEVEL: INFO
+      KC_HEALTH_ENABLED: "true"
+      # Needed for iframe-based silent SSO to work (allows cross-origin frames)
+      KC_SPI_LOGIN_PROTOCOL_OPENID_CONNECT_LEGACY_LOGOUT_REDIRECT_URI: "true"
+    volumes:
+      - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json
+      - ./keycloak/themes/iom-itb:/opt/keycloak/themes/iom-itb
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - sso-net
+    healthcheck:
+      # Keycloak 24+ management port is 9000. curl/wget are not in the image,
+      # so we use bash's built-in /dev/tcp to check the health endpoint.
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/9000 && echo -e 'GET /health/ready HTTP/1.0\\r\\nHost: localhost\\r\\n\\r\\n' >&3 && grep -q 'UP' <&3"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+
+  # ─────────────────────────────────────────────
+  # Backend — Express API with JWT verification
+  # ─────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sso-backend
+    environment:
+      PORT: 4000
+      NODE_ENV: development
+      DATABASE_URL: postgresql://sso_app_user:sso_app_pass@postgres:5432/sso_app
+      # Use docker hostname for fetching JWKS keys (internal network)
+      KEYCLOAK_JWKS_URI: http://keycloak:8080/realms/sso-poc/protocol/openid-connect/certs
+      # Use localhost for issuer validation (tokens have localhost in the 'iss' claim)
+      KEYCLOAK_ISSUER: http://localhost:8080/realms/sso-poc
+      CORS_ORIGINS: http://localhost:3001,http://localhost:3002
+    ports:
+      - "4000:4000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    networks:
+      - sso-net
+    restart: on-failure
+
+  # ─────────────────────────────────────────────
+  # Frontend 1 — "App Alpha" (Blue theme)
+  # ─────────────────────────────────────────────
+  frontend-1:
+    build:
+      context: ./frontend-1
+      dockerfile: Dockerfile
+    container_name: sso-frontend-1
+    ports:
+      - "3001:80"
+    networks:
+      - sso-net
+    depends_on:
+      - backend
+
+  # ─────────────────────────────────────────────
+  # Frontend 2 — "App Beta" (Green theme)
+  # ─────────────────────────────────────────────
+  frontend-2:
+    build:
+      context: ./frontend-2
+      dockerfile: Dockerfile
+    container_name: sso-frontend-2
+    ports:
+      - "3002:80"
+    networks:
+      - sso-net
+    depends_on:
+      - backend

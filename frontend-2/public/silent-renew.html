@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+  <head><title>Silent Renew</title></head>
+  <body>
+    <script>
+      import('https://cdn.jsdelivr.net/npm/oidc-client-ts@3/dist/browser/oidc-client-ts.min.js')
+        .then(({ UserManager }) => {
+          new UserManager({}).signinSilentCallback();
+        })
+        .catch(() => {
+          window.parent.postMessage({ source: 'silent-renew-error' }, '*');
+        });
+    </script>
+  </body>
+</html>
