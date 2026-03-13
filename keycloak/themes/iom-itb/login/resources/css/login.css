@@ -1,38 +1,163 @@
-/* IOM ITB custom login theme */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* ── Header: replace text with logo ── */
+body {
+    background-color: #D0E2FF !important;
+    background-image: 
+        linear-gradient(rgba(208, 226, 255, 0.8), rgba(208, 226, 255, 0.8)), 
+        url('../img/bg-itb.webp') !important;
+
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
+    background-position: center center !important;
+    background-size: cover !important;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif, Roboto, Helvetica !important;
+}
+
+/* 2. Logo IOM ITB di Atas (Luar Card) */
+#kc-header {
+    margin-bottom: 20px;
+}
 #kc-header-wrapper {
-  font-size: 0 !important;        /* Hide the displayName text */
-  line-height: 0 !important;
-  padding-bottom: 24px;
+    font-size: 0 !important; /* Hilangkan teks default */
+    background: url('../img/iom-itb.png') no-repeat center;
+    background-size: contain;
+    height: 40px;
+    width: 100%;
+    display: block;
 }
 
-#kc-header-wrapper::before {
-  content: '';
-  display: block;
-  width: 240px;                    /* Logo is 1549x970 (~1.6:1 ratio) */
-  height: 150px;
-  margin: 0 auto 8px;
-  background: url('../img/iom-itb.png') center / contain no-repeat;
+/* 3. Card Form Putih */
+.login-pf-page .card-pf {
+    max-width: 324px;
+    margin: 0 auto;
+    padding: 30px 40px;
+    background: rgba(255, 255, 255, 0.98) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+    border: none !important;
 }
 
-/* ── Card: constrain width and prevent overflow ── */
-.card-pf {
-  max-width: 440px;
-  margin: 0 auto;
-  overflow: hidden;
-  border-radius: 8px;
+/* 4. Judul "Selamat Datang" */
+.custom-title {
+    text-align: center;
+    margin-bottom: 30px;
+}
+.custom-title h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #000;
+    line-height: 1.4;
+    margin: 0;
 }
 
-/* ── Login button: IOM branding ── */
-#kc-form-buttons .pf-c-button.pf-m-primary,
-#kc-form-buttons input.pf-c-button.pf-m-primary {
-  background-color: #1a3a6b;
-  border-color: #1a3a6b;
+/* 5. Input Fields */
+.form-group {
+    margin-bottom: 20px;
 }
 
-#kc-form-buttons .pf-c-button.pf-m-primary:hover,
-#kc-form-buttons input.pf-c-button.pf-m-primary:hover {
-  background-color: #142d54;
-  border-color: #142d54;
+.control-label {
+    display: block;
+    font-weight: 600;
+    color: #111;
+    margin-bottom: 8px;
+    font-size: 14px;
+    text-align: left;
+}
+.form-control {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db !important;
+    border-radius: 8px !important;
+    font-size: 13px;
+    box-sizing: border-box;
+    background-color: #fff !important;
+    height: auto !important;
+}
+.form-control::placeholder {
+    color: #9ca3af;
+    font-size: 13px;
+}
+.form-control:focus {
+    outline: none;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
+}
+
+/* 6. Link Lupa Sandi */
+.login-options {
+    text-align: right;
+    margin-top: -10px;
+    margin-bottom: 25px;
+}
+.forgot-password {
+    color: #0052DB;
+    font-size: 12px;
+    text-decoration: none;
+    font-weight: 400;
+}
+.forgot-password:hover {
+    text-decoration: underline;
+}
+
+/* 7. Tombol Sign In */
+#kc-login {
+    width: 100%;
+    background-color: #2577FF !important; /* Warna biru cerah */
+    background-image: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+
+    color: white !important;
+    backdrop-filter: none;
+    border: none !important;
+    padding: 10px !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    height: auto !important;
+}
+
+#kc-login:hover {
+    background-color: #0052DB !important;
+}
+
+#kc-page-title {
+  display: none;
+}
+
+/* Container Box Merah Muda */
+.error-message-container {
+    background-color: #FEE2E2 !important; /* Merah muda pudar */
+    border-radius: 4px;
+    padding: 12px;
+    margin-bottom: 20px;
+}
+
+/* Teks Error Merah Tua */
+.error-text {
+    color: #991B1B !important; /* Merah tua agar terbaca jelas */
+    font-size: 12px;
+    margin: 0;
+    font-weight: 400;
+    text-align: left;
+}
+
+/* Opsional: Ubah border input jadi merah saat error */
+.form-control.error {
+    border-color: #EF4444 !important;
+}
+
+#kc-content-wrapper .alert-error, 
+#kc-content-wrapper .alert-warning,
+.alert-error, .alert-warning {
+    display: none !important;
 }
