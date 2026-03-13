@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from 'react-oidc-context';
+import AppSwitcher from '../components/AppSwitcher.jsx';
 
 const THEME = {
   primary: '#1a56db',
@@ -128,6 +129,7 @@ export default function Dashboard() {
           />
         </section>
       </main>
+      <AppSwitcher userRoles={auth.user?.profile?.realm_access?.roles || []} />
     </div>
   );
 }
